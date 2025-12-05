@@ -1,0 +1,5 @@
+{
+  "name": "EcoHydro Visualizer",
+  "description": "An interactive educational tool for visualizing and understanding ecohydrological systems through AI-generated simulations and prediction cycles.",
+  "requestFramePermissions": []
+}
