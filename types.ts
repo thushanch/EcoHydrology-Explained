@@ -4,6 +4,7 @@ export interface Message {
   text: string;
   imageUrl?: string; // If the message includes a generated image
   isThinking?: boolean; // For UI loading states
+  widget?: 'meander-sequence'; // Interactive widget type
 }
 
 export interface Module {
@@ -18,6 +19,13 @@ export interface GlossaryItem {
   term: string;
   definition: string;
   category: string;
+}
+
+export interface SequenceStep {
+  id: string;
+  label: string;
+  description: string;
+  visual: string; // Emoji or icon class
 }
 
 export enum AppState {

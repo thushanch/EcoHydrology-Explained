@@ -1,4 +1,4 @@
-import { Module, GlossaryItem } from './types';
+import { Module, GlossaryItem, SequenceStep } from './types';
 
 export const SYSTEM_INSTRUCTION = `
 You are the **EcoHydro Visualizer**, an advanced interactive educational tool.
@@ -8,6 +8,9 @@ Your goal is to teach ecohydrology through a cycle of: **Theory -> Visual Simula
 1.  **Visual First:** Concepts must be visualized. When you need to generate an image, append a tag like \`<DRAW>...image prompt description...</DRAW>\` to the end of your response.
 2.  **Theory Assessment:** Do not just lecture. Explain, then pause and ask the user to PREDICT.
 3.  **Image Style:** All image prompts inside <DRAW> tags must end with: "Educational scientific illustration, high resolution, schematic cross-section, white background, distinct colors, vector art style, clear labels."
+4.  **Interactive Widgets:** 
+    *   For the "River Meander & Oxbows" module, **specifically after** you explain the initial concept of how curves start to form but BEFORE the final oxbow formation is fully explained, trigger the sequencing task by including the tag: \`<WIDGET:MEANDER_SEQUENCE>\`.
+    *   Do not describe the full sequence in text immediately before the widget; let the user try to figure it out.
 
 **SESSION WORKFLOW:**
 
@@ -32,8 +35,8 @@ Your goal is to teach ecohydrology through a cycle of: **Theory -> Visual Simula
 Scientific, encouraging, clear, and structured.
 
 **IMPORTANT:**
-You are communicating with a web app that parses \`<DRAW>\` tags. Ensure the content inside \`<DRAW>\` is a descriptive prompt for an image generator.
-Do not output markdown images (e.g., ![...]), only the \`<DRAW>\` tag.
+You are communicating with a web app that parses \`<DRAW>\` and \`<WIDGET:MEANDER_SEQUENCE>\` tags.
+Do not output markdown images (e.g., ![...]), only the tags.
 `;
 
 export const MODULES: Module[] = [
@@ -42,7 +45,7 @@ export const MODULES: Module[] = [
     title: 'River Meander & Oxbows',
     icon: '🌊',
     description: 'Explore how flow velocity and erosion create winding rivers and oxbow lakes.',
-    initialPrompt: 'Start the "River Meander Evolution" module. Explain the basic mechanics of a straight river channel beginning to curve, and generate a baseline image of a slightly meandering river with velocity vectors indicated.'
+    initialPrompt: 'Start the "River Meander Evolution" module. Explain the basic mechanics of a straight river channel beginning to curve due to helicoidal flow, and generate a baseline image of a slightly meandering river with velocity vectors indicated.'
   },
   {
     id: 'lake-stratification',
@@ -91,4 +94,37 @@ export const GLOSSARY_TERMS: GlossaryItem[] = [
   { term: "Flood Pulse", definition: "The periodic rise and fall of river waters that inundates the floodplain, exchanging nutrients and organisms.", category: "Wetlands" },
   { term: "Riparian Zone", definition: "The interface between land and a river or stream.", category: "Wetlands" },
   { term: "Evapotranspiration", definition: "The sum of evaporation from the land surface plus transpiration from plants.", category: "Wetlands" }
+];
+
+export const MEANDER_SEQUENCE_STEPS: SequenceStep[] = [
+  { 
+    id: 'straight', 
+    label: 'Straight Channel', 
+    description: 'Initial fast flow, thalweg (deepest point) roughly in center.',
+    visual: '📏'
+  },
+  { 
+    id: 'curve-init', 
+    label: 'Meander Initiation', 
+    description: 'Thalweg shifts; Outer bank erosion begins, Inner bank deposition starts.',
+    visual: '〰️'
+  },
+  { 
+    id: 'loop-expand', 
+    label: 'Loop Expansion', 
+    description: 'Centrifugal force increases curvature; Neck of land narrows.',
+    visual: '↩️'
+  },
+  { 
+    id: 'cutoff', 
+    label: 'Cutoff Event', 
+    description: 'River breaches the neck during high flow, shortening the path.',
+    visual: '✂️'
+  },
+  { 
+    id: 'oxbow', 
+    label: 'Oxbow Lake', 
+    description: 'Old loop is isolated by sediment plugs, forming a crescent lake.',
+    visual: '🏞️'
+  }
 ];

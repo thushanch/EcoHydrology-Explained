@@ -1,19 +1,28 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Message } from '../types';
+import { SequenceReorder } from './SequenceReorder';
 
 interface ChatMessageProps {
   message: Message;
+  onWidgetComplete?: (data: string) => void;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onWidgetComplete }) => {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
 
   if (isSystem) return null;
 
+  const handleSequenceComplete = (score: number, max: number, confidence: string) => {
+    if (onWidgetComplete) {
+      const percentage = Math.round((score / max) * 100);
+      onWidgetComplete(`Interactive Task Result: I scored ${score}/${max} (${percentage}%) with ${confidence} confidence.`);
+    }
+  };
+
   return (
     <div className={`flex w-full mb-6 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[85%] md:max-w-[75%] flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[95%] md:max-w-[85%] flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
         
         {/* Avatar / Name */}
         <div className="flex items-center mb-1 text-xs text-slate-400 uppercase tracking-wider font-semibold">
@@ -51,6 +60,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             />
           </div>
         )}
+
+        {/* Interactive Widget (Only for Model) */}
+        {message.widget === 'meander-sequence' && (
+          <div className="w-full mt-2 animate-slide-up">
+            <SequenceReorder onComplete={handleSequenceComplete} />
+          </div>
+        )}
+
       </div>
     </div>
   );

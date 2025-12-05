@@ -56,6 +56,25 @@ export default function App() {
     await processAIResponse(inputText);
   };
 
+  // Called when a widget (like Sequence Reorder) completes
+  const handleWidgetResult = async (resultText: string) => {
+     // We treat the widget result as a silent user message or a system info message 
+     // that we immediately send to AI so it can react.
+     
+     // Optionally show it in UI? Let's just send it to AI and let AI reply.
+     // We can add a small "system" message to UI or just let the AI reply to "hidden" context.
+     // For clarity, we'll append a user message representing the result.
+     
+     const resultMsg: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        text: resultText
+     };
+     setMessages(prev => [...prev, resultMsg]);
+     setIsThinking(true);
+     await processAIResponse(resultText);
+  };
+
   const processAIResponse = async (input: string) => {
     setIsThinking(true);
     
@@ -63,34 +82,46 @@ export default function App() {
       // 1. Get Text Response
       const rawText = await sendMessageToGemini(input);
       
-      // 2. Parse for <DRAW> tag
+      // 2. Parse tags
       const drawTagRegex = /<DRAW>(.*?)<\/DRAW>/s;
-      const match = rawText.match(drawTagRegex);
+      const widgetTagRegex = /<WIDGET:([A-Z_]+)>/;
+
+      const drawMatch = rawText.match(drawTagRegex);
+      const widgetMatch = rawText.match(widgetTagRegex);
       
-      let cleanText = rawText.replace(drawTagRegex, '').trim();
+      let cleanText = rawText
+        .replace(drawTagRegex, '')
+        .replace(widgetTagRegex, '')
+        .trim();
       
+      // Determine widget type
+      let widgetType: 'meander-sequence' | undefined = undefined;
+      if (widgetMatch && widgetMatch[1] === 'MEANDER_SEQUENCE') {
+        widgetType = 'meander-sequence';
+      }
+
       // Update UI with text first
       setMessages(prev => {
-        // Remove temp loading messages if any
+        // Remove temp loading messages
         const filtered = prev.filter(m => !m.isThinking);
         return [...filtered, {
           id: Date.now().toString(),
           role: 'model',
           text: cleanText,
-          imageUrl: undefined // We'll update this later if image exists
+          imageUrl: undefined,
+          widget: widgetType
         }];
       });
 
       setIsThinking(false);
 
       // 3. Generate Image if needed
-      if (match && match[1]) {
+      if (drawMatch && drawMatch[1]) {
         setIsGeneratingImage(true);
-        const imagePrompt = match[1].trim();
+        const imagePrompt = drawMatch[1].trim();
         const base64Image = await generateEcoImage(imagePrompt);
         
         if (base64Image) {
-          // Update the last message to include the image
           setMessages(prev => {
             const newHistory = [...prev];
             const lastMsg = newHistory[newHistory.length - 1];
@@ -191,7 +222,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-hide">
         <div className="max-w-3xl mx-auto">
           {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
+            <ChatMessage key={msg.id} message={msg} onWidgetComplete={handleWidgetResult} />
           ))}
           
           {/* Typing Indicators */}
