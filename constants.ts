@@ -11,6 +11,7 @@ Your goal is to teach ecohydrology through a cycle of: **Theory -> Visual Simula
 4.  **Interactive Widgets:** 
     *   For the "River Meander & Oxbows" module, **specifically after** you explain the initial concept of how curves start to form but BEFORE the final oxbow formation is fully explained, trigger the sequencing task by including the tag: \`<WIDGET:MEANDER_SEQUENCE>\`.
     *   Do not describe the full sequence in text immediately before the widget; let the user try to figure it out.
+    *   **CRITICAL:** When the user completes the \`<WIDGET:MEANDER_SEQUENCE>\`, your NEXT step (Phase 2) MUST be to introduce a **"Flood Pulse"** event. Describe a sudden increase in river discharge and velocity. Ask the user to predict how this specific event affects the narrow neck of the meander (focusing on sediment transport and erosion force).
 
 **SESSION WORKFLOW:**
 
@@ -20,10 +21,13 @@ Your goal is to teach ecohydrology through a cycle of: **Theory -> Visual Simula
 *   **CRITICAL STEP:** After showing the image, ask the user to describe what they see in their own words to confirm they understand the baseline state before moving on.
 *   **STOP** and wait for user input.
 
-**Phase 2: The Challenge**
+**Phase 2: The Challenge (The Variable Change)**
 *   Acknowledge the user's description and provide gentle correction if needed.
-*   Introduce a variable change (e.g., "Summer approaches", "Flood pulse begins").
-*   Ask the user to PREDICT the outcome.
+*   **Introduce a specific variable change:**
+    *   *River Meander:* "A massive storm causes a Flood Pulse."
+    *   *Lake Stratification:* "Summer approaches/Solar heating increases."
+    *   *Groundwater:* "New contamination source introduced."
+*   Ask the user to PREDICT the outcome based on physics/theory.
 *   **STOP** and wait for user input.
 
 **Phase 3: Assessment & Result**
@@ -45,28 +49,28 @@ export const MODULES: Module[] = [
     title: 'River Meander & Oxbows',
     icon: '🌊',
     description: 'Explore how flow velocity and erosion create winding rivers and oxbow lakes.',
-    initialPrompt: 'Start the "River Meander Evolution" module. Explain the basic mechanics of a straight river channel beginning to curve due to helicoidal flow, and generate a baseline image of a slightly meandering river with velocity vectors indicated.'
+    initialPrompt: 'Start the "River Meander Evolution" module. 1. Explain the basic mechanics of a straight river channel beginning to curve due to helicoidal flow. 2. Generate a baseline image of a slightly meandering river with velocity vectors. 3. Ask the user to describe the baseline. 4. Trigger the <WIDGET:MEANDER_SEQUENCE>. 5. After the widget, introduce a "Flood Pulse" event and ask for a prediction on meander cutoff.'
   },
   {
     id: 'lake-stratification',
     title: 'Lake Stratification',
     icon: '🌡️',
     description: 'Understand thermal layers (Epilimnion, Thermocline, Hypolimnion) in lakes.',
-    initialPrompt: 'Start the "Lake Stratification" module. Explain the state of a deep lake in early spring (uniform temperature) and generate a baseline cross-section image of this state.'
+    initialPrompt: 'Start the "Lake Stratification" module. Explain the state of a deep lake in early spring (uniform temperature) and generate a baseline cross-section image of this state. Ask the user to describe the baseline state.'
   },
   {
     id: 'groundwater-plume',
     title: 'Groundwater Plume',
     icon: '🛢️',
     description: 'Track contamination movement through aquifers based on hydraulic gradients.',
-    initialPrompt: 'Start the "Groundwater Contamination Plume" module. Show a cross-section of an aquifer with a new surface spill (source), but no plume yet. Explain the hydrogeological setting.'
+    initialPrompt: 'Start the "Groundwater Contamination Plume" module. Show a cross-section of an aquifer with a new surface spill (source), but no plume yet. Explain the hydrogeological setting. Ask the user to describe the baseline state.'
   },
   {
     id: 'wetland-hydro',
     title: 'Wetland Hydro-patterning',
     icon: '🌾',
     description: 'Visualize vegetation zonation changes during flood pulses and drawdowns.',
-    initialPrompt: 'Start the "Wetland Hydroperiod" module. Explain the "Flood Pulse" concept and generate a cross-section of a wetland in a high-water state with submerged vegetation.'
+    initialPrompt: 'Start the "Wetland Hydroperiod" module. Explain the "Flood Pulse" concept and generate a cross-section of a wetland in a high-water state with submerged vegetation. Ask the user to describe the baseline state.'
   }
 ];
 
@@ -118,7 +122,7 @@ export const MEANDER_SEQUENCE_STEPS: SequenceStep[] = [
   { 
     id: 'cutoff', 
     label: 'Cutoff Event', 
-    description: 'River breaches the neck during high flow, shortening the path.',
+    description: 'River breaches the neck during high flow (Flood Pulse), shortening the path.',
     visual: '✂️'
   },
   { 
